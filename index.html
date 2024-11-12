@@ -1,0 +1,60 @@
+<html lang="pt-BR"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor Dólar/Real</title>
+</head>
+<body>
+    <h2>Conversão Dólar/Real</h2>
+    <form id="conversionForm">
+        <label for="amount">Valor:</label>
+        <input type="number" id="amount" required="">
+        
+        <label for="currency">Converter para:</label>
+        <select id="currency">
+            <option value="USD-BRL">Real para Dólar</option>
+            <option value="BRL-USD">Dólar para Real</option>
+        </select>
+        
+        <div style="margin-top: 10px;">
+            <button type="button" onclick="convertCurrency()">Converter</button>
+            <button type="button" onclick="clearFields()">Limpar</button>
+        </div>
+    </form>
+    
+    <h3 id="result">Resultado: </h3>
+
+    <script>
+        async function convertCurrency() {
+            const amount = parseFloat(document.getElementById('amount').value);
+            const currencyPair = document.getElementById('currency').value;
+            const resultElement = document.getElementById('result');
+
+            if (isNaN(amount) || amount <= 0) {
+                resultElement.textContent = "Por favor, insira um valor válido.";
+                return;
+            }
+
+            try {
+                const response = await fetch(`https://economia.awesomeapi.com.br/last/${currencyPair}`);
+                const data = await response.json();
+
+                // Acessa o valor da cotação baseado no par escolhido
+                const rate = currencyPair === "USD-BRL" ? data.USDBRL.bid : data.BRLUSD.bid;
+                const convertedAmount = amount * parseFloat(rate);
+                
+                resultElement.textContent = `Resultado: ${convertedAmount.toFixed(2)}`;
+            } catch (error) {
+                resultElement.textContent = "Erro ao buscar a cotação. Tente novamente.";
+            }
+        }
+
+        function clearFields() {
+            document.getElementById('amount').value = '';
+            document.getElementById('currency').value = 'USD-BRL';
+            document.getElementById('result').textContent = 'Resultado: ';
+        }
+    </script>
+
+
+</body>
+</html>
